@@ -8,18 +8,28 @@ namespace OrderProvider.Business.Services;
 public class OrderService : IOrderService
 {
     private readonly IOrderRepository<Order> _orderRepository;
+    private readonly IOrderValidator _orderValidator;
 
-    public OrderService(IOrderRepository<Order> orderRepository)
+    public OrderService(IOrderRepository<Order> orderRepository, IOrderValidator orderValidator)
     {
         _orderRepository = orderRepository;
+        _orderValidator = orderValidator;
     }
     public ResponseResultWithData<Order> Create(OrderRequest orderRequest)
     {
 
         try
         {
+            var validationResult = _orderValidator.Validate(orderRequest);
+
+            if (!validationResult.Success)
+            {
+                return ResponseFactory<Order>.Failed(null!);
+            }
+
             var order = OrderFactory.Create(orderRequest);
             var result = _orderRepository.Create(order);
+            
             if (result.Success)
             {
                 return ResponseFactory<Order>.Success(result.Data!);
@@ -39,11 +49,9 @@ public class OrderService : IOrderService
         try
         {
             return _orderRepository.GetAll();
-
         }
         catch
         {
-
             return ResponseFactory<IEnumerable<Order>>.Failed(null!);
         }
     }
