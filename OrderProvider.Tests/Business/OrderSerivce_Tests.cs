@@ -25,7 +25,7 @@ public class OrderSerivce_Tests
             {
                 FirstName = "Tomten",
                 LastName = "Tomtefar",
-                Email = ""
+                Email = "tomten@domain.com"
 
             },
             DeliveryAddress = new Address
